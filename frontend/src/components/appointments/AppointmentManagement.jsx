@@ -1,17 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import { appointmentService } from '../../services/appointments';
-import { doctorService } from '../../services/doctors';
-import AppointmentList from './AppointmentList';
-import BookAppointmentModal from './BookAppointmentModal';
-import LoadingSpinner from '../common/LoadingSpinner';
+import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import { appointmentService } from "../../services/appointments";
+import { doctorService } from "../../services/doctors";
+import AppointmentList from "./AppointmentList";
+import BookAppointmentModal from "./BookAppointmentModal";
+import LoadingSpinner from "../common/LoadingSpinner";
 
 const AppointmentManagement = () => {
   const [appointments, setAppointments] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showBookModal, setShowBookModal] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [rescheduleData, setRescheduleData] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
 
   useEffect(() => {
     loadData();
@@ -21,12 +24,12 @@ const AppointmentManagement = () => {
     try {
       const [appointmentsData, doctorsData] = await Promise.all([
         appointmentService.getAllAppointments(selectedDate),
-        doctorService.getAllDoctors()
+        doctorService.getAllDoctors(),
       ]);
       setAppointments(appointmentsData);
       setDoctors(doctorsData);
     } catch (error) {
-      console.error('Failed to load data:', error);
+      console.error("Failed to load data:", error);
     } finally {
       setLoading(false);
     }
@@ -35,34 +38,55 @@ const AppointmentManagement = () => {
   const handleBookAppointment = async (appointmentData) => {
     try {
       await appointmentService.createAppointment(appointmentData);
-      toast.success('Appointment booked successfully!');
+      toast.success("Appointment booked successfully!");
       loadData();
       setShowBookModal(false);
     } catch (error) {
-      console.error('Failed to book appointment:', error);
+      console.error("Failed to book appointment:", error);
+      toast.error("Failed to book appointment!");
     }
   };
 
   const handleUpdateStatus = async (id, status) => {
     try {
       await appointmentService.updateAppointment(id, { status });
-      toast.success('Appointment status updated!');
+      toast.success("Appointment status updated!");
       loadData();
     } catch (error) {
-      console.error('Failed to update appointment:', error);
+      console.error("Failed to update appointment:", error);
+      toast.error("Failed to update status!");
     }
   };
 
   const handleCancelAppointment = async (id) => {
-    if (window.confirm('Are you sure you want to cancel this appointment?')) {
+    if (window.confirm("Are you sure you want to cancel this appointment?")) {
       try {
-        await appointmentService.updateAppointment(id, { status: 'cancelled' });
-        toast.success('Appointment cancelled!');
+        await appointmentService.updateAppointment(id, { status: "cancelled" });
+        toast.info("Appointment cancelled!");
         loadData();
       } catch (error) {
-        console.error('Failed to cancel appointment:', error);
+        console.error("Failed to cancel appointment:", error);
+        toast.error("Failed to cancel appointment!");
       }
     }
+  };
+
+  const handleDeleteAppointment = async (id) => {
+    if (window.confirm("Are you sure you want to delete this cancelled appointment?")) {
+      try {
+        await appointmentService.deleteAppointment(id);
+        toast.success("Appointment deleted!");
+        loadData();
+      } catch (error) {
+        console.error("Failed to delete appointment:", error);
+        toast.error("Failed to delete appointment!");
+      }
+    }
+  };
+
+  const handleRescheduleAppointment = (appointment) => {
+    setRescheduleData(appointment);
+    setShowBookModal(true);
   };
 
   if (loading) return <LoadingSpinner />;
@@ -80,10 +104,16 @@ const AppointmentManagement = () => {
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
                 className="form-control"
-                style={{ width: 'auto', display: 'inline-block' }}
+                style={{ width: "auto", display: "inline-block" }}
               />
             </div>
-            <button className="btn btn-primary" onClick={() => setShowBookModal(true)}>
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                setShowBookModal(true);
+                setRescheduleData(null); // fresh booking
+              }}
+            >
               Book Appointment
             </button>
           </div>
@@ -93,14 +123,17 @@ const AppointmentManagement = () => {
           appointments={appointments}
           onUpdateStatus={handleUpdateStatus}
           onCancelAppointment={handleCancelAppointment}
+          onDeleteAppointment={handleDeleteAppointment}
+          onRescheduleAppointment={handleRescheduleAppointment}
         />
       </div>
 
       <BookAppointmentModal
         isOpen={showBookModal}
         onClose={() => setShowBookModal(false)}
-        onSubmit={handleBookAppointment}
+        onSubmit={rescheduleData ? handleUpdateStatus : handleBookAppointment}
         doctors={doctors}
+        rescheduleData={rescheduleData}
       />
     </div>
   );

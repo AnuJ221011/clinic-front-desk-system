@@ -13,17 +13,11 @@ router.use((req, res, next) => {
   next();
 });
 
-// @route   POST /api/auth/login
-// @desc    Login user
-// @access  Public
 router.post('/login', [
   body('username').notEmpty().withMessage('Username is required'),
   body('password').notEmpty().withMessage('Password is required')
 ], login);
 
-// @route   GET /api/auth/profile
-// @desc    Get user profile
-// @access  Private
 router.get('/profile', auth, getProfile);
 
 module.exports = router;

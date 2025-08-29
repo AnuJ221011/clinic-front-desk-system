@@ -10,14 +10,7 @@ const auth = require('../middleware/auth');
 
 const router = express.Router();
 
-// @route   GET /api/doctors
-// @desc    Get all doctors
-// @access  Private
 router.get('/', auth, getAllDoctors);
-
-// @route   POST /api/doctors
-// @desc    Create doctor
-// @access  Private
 router.post('/', [
   auth,
   body('name').notEmpty().withMessage('Name is required'),
@@ -27,14 +20,7 @@ router.post('/', [
   body('availability').isArray().withMessage('Availability must be an array')
 ], createDoctor);
 
-// @route   PUT /api/doctors/:id
-// @desc    Update doctor
-// @access  Private
 router.put('/:id', auth, updateDoctor);
-
-// @route   DELETE /api/doctors/:id
-// @desc    Delete doctor
-// @access  Private
 router.delete('/:id', auth, deleteDoctor);
 
 module.exports = router;

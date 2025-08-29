@@ -27,14 +27,7 @@ router.post('/', [
   body('doctorId').isInt().withMessage('Valid doctor ID is required')
 ], createAppointment);
 
-// @route   PUT /api/appointments/:id
-// @desc    Update appointment
-// @access  Private
 router.put('/:id', auth, updateAppointment);
-
-// @route   DELETE /api/appointments/:id
-// @desc    Delete appointment
-// @access  Private
 router.delete('/:id', auth, deleteAppointment);
 
 module.exports = router;
