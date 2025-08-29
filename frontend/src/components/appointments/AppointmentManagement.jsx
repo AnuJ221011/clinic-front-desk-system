@@ -30,6 +30,7 @@ const AppointmentManagement = () => {
       setDoctors(doctorsData);
     } catch (error) {
       console.error("Failed to load data:", error);
+      toast.error("Failed to load appointments");
     } finally {
       setLoading(false);
     }
@@ -72,7 +73,9 @@ const AppointmentManagement = () => {
   };
 
   const handleDeleteAppointment = async (id) => {
-    if (window.confirm("Are you sure you want to delete this cancelled appointment?")) {
+    if (
+      window.confirm("Are you sure you want to delete this cancelled appointment?")
+    ) {
       try {
         await appointmentService.deleteAppointment(id);
         toast.success("Appointment deleted!");
@@ -92,33 +95,36 @@ const AppointmentManagement = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div>
-      <div className="card">
-        <div className="flex flex-between flex-align-center mb-1">
-          <h2>Appointment Management</h2>
-          <div className="flex gap-1 flex-align-center">
+    <div className="p-6">
+      <div className="bg-gray-900 text-gray-100 rounded-2xl shadow-xl p-6 border border-gray-800">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-6">
+          <h2 className="text-2xl font-bold text-indigo-400">
+            Appointment Management
+          </h2>
+          <div className="flex gap-4 items-center">
             <div>
-              <label>Date: </label>
+              <label className="text-sm text-gray-400 mr-2">Date:</label>
               <input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="form-control"
-                style={{ width: "auto", display: "inline-block" }}
+                className="bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
             <button
-              className="btn btn-primary"
+              className="bg-indigo-600 hover:bg-indigo-700 transition px-5 py-2 rounded-lg text-white text-sm font-medium shadow-md"
               onClick={() => {
                 setShowBookModal(true);
                 setRescheduleData(null); // fresh booking
               }}
             >
-              Book Appointment
+              + Book Appointment
             </button>
           </div>
         </div>
 
+        {/* Appointment List */}
         <AppointmentList
           appointments={appointments}
           onUpdateStatus={handleUpdateStatus}
@@ -128,6 +134,7 @@ const AppointmentManagement = () => {
         />
       </div>
 
+      {/* Modal */}
       <BookAppointmentModal
         isOpen={showBookModal}
         onClose={() => setShowBookModal(false)}

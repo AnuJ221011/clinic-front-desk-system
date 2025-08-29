@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import { queueService } from '../../services/queue';
-import QueueList from './QueueList';
-import AddPatientModal from './AddPatientModal';
-import LoadingSpinner from '../common/LoadingSpinner';
+import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import { queueService } from "../../services/queue";
+import QueueList from "./QueueList";
+import AddPatientModal from "./AddPatientModal";
+import LoadingSpinner from "../common/LoadingSpinner";
 
 const QueueManagement = () => {
   const [queue, setQueue] = useState([]);
@@ -19,7 +19,7 @@ const QueueManagement = () => {
       const data = await queueService.getAllQueue();
       setQueue(data);
     } catch (error) {
-      console.error('Failed to load queue:', error);
+      console.error("Failed to load queue:", error);
     } finally {
       setLoading(false);
     }
@@ -28,44 +28,44 @@ const QueueManagement = () => {
   const handleAddPatient = async (patientData) => {
     try {
       await queueService.addToQueue(patientData);
-      toast.success('Patient added to queue successfully!');
+      toast.success("Patient added to queue successfully!");
       loadQueue();
       setShowAddModal(false);
     } catch (error) {
-      console.error('Failed to add patient:', error);
+      console.error("Failed to add patient:", error);
     }
   };
 
   const handleUpdateStatus = async (id, status) => {
     try {
       await queueService.updateQueueStatus(id, status);
-      toast.success('Queue status updated!');
+      toast.success("Queue status updated!");
       loadQueue();
     } catch (error) {
-      console.error('Failed to update status:', error);
+      console.error("Failed to update status:", error);
     }
   };
 
   const handleRemovePatient = async (id) => {
-    if (window.confirm('Are you sure you want to remove this patient from the queue?')) {
+    if (window.confirm("Are you sure you want to remove this patient from the queue?")) {
       try {
         await queueService.removeFromQueue(id);
-        toast.success('Patient removed from queue!');
+        toast.success("Patient removed from queue!");
         loadQueue();
       } catch (error) {
-        console.error('Failed to remove patient:', error);
+        console.error("Failed to remove patient:", error);
       }
     }
   };
 
   const handleClearQueue = async () => {
-    if (window.confirm('Are you sure you want to clear the entire queue?')) {
+    if (window.confirm("Are you sure you want to clear the entire queue?")) {
       try {
         await queueService.clearQueue();
-        toast.success('Queue cleared successfully!');
+        toast.success("Queue cleared successfully!");
         loadQueue();
       } catch (error) {
-        console.error('Failed to clear queue:', error);
+        console.error("Failed to clear queue:", error);
       }
     }
   };
@@ -73,22 +73,30 @@ const QueueManagement = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div>
-      <div className="card">
-        <div className="flex flex-between flex-align-center mb-1">
-          <h2>Queue Management</h2>
-          <div className="flex gap-1">
-            <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+    <div className="p-4">
+      <div className="bg-gray-900 shadow-lg rounded-xl p-6 border border-gray-700">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold text-gray-100">Queue Management</h2>
+          <div className="flex gap-3">
+            <button
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              onClick={() => setShowAddModal(true)}
+            >
               Add Patient
             </button>
             {queue.length > 0 && (
-              <button className="btn btn-warning" onClick={handleClearQueue}>
+              <button
+                className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition"
+                onClick={handleClearQueue}
+              >
                 Clear Queue
               </button>
             )}
           </div>
         </div>
 
+        {/* Queue List */}
         <QueueList
           queue={queue}
           onUpdateStatus={handleUpdateStatus}
@@ -96,6 +104,7 @@ const QueueManagement = () => {
         />
       </div>
 
+      {/* Modal */}
       <AddPatientModal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}

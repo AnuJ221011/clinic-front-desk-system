@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
-import { toast } from 'react-toastify';
-import { authService } from '../../services/auth';
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import { authService } from "../../services/auth";
 
 const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({
-    username: '',
-    password: ''
+    username: "",
+    password: "",
   });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -22,61 +23,67 @@ const Login = ({ onLogin }) => {
 
     try {
       const response = await authService.login(formData);
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      toast.success('Login successful!');
+      localStorage.setItem("token", response.token);
+      localStorage.setItem("user", JSON.stringify(response.user));
+      toast.success("Login successful!");
       onLogin(response.user);
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error("Login failed:", error);
+      toast.error("Invalid username or password!");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <h2 className="text-center mb-2" style={{ color: '#374151' }}>
-          Clinic Front Desk System
-        </h2>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Username</label>
+    <div className="flex h-screen w-screen items-center justify-center bg-gray-900">
+      <div className="w-full max-w-md bg-gray-800 rounded-2xl shadow-lg p-8">
+        <h2 className="text-3xl font-bold text-center text-white mb-6">Login</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Username */}
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={formData.username}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white 
+                       placeholder-gray-400 focus:outline-none focus:ring-2 
+                       focus:ring-indigo-500"
+          />
+
+          {/* Password with toggle */}
+          <div className="relative">
             <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              className="form-control"
-              required
-              placeholder="Enter username"
-            />
-          </div>
-          <div className="form-group">
-            <label>Password</label>
-            <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
+              placeholder="Password"
               value={formData.password}
               onChange={handleChange}
-              className="form-control"
               required
-              placeholder="Enter password"
+              className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white 
+                         placeholder-gray-400 focus:outline-none focus:ring-2 
+                         focus:ring-indigo-500"
             />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-400"
+            >
+              {showPassword ? "🙈" : "👁️"}
+            </span>
           </div>
-          <button 
-            type="submit" 
-            className="btn btn-primary"
-            style={{ width: '100%' }}
+
+          {/* Submit Button */}
+          <button
+            type="submit"
             disabled={loading}
+            className="w-full py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 
+                       text-white font-semibold transition disabled:opacity-50"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? "Signing in..." : "Login"}
           </button>
         </form>
-        <div className="mt-1 text-center text-gray text-sm">
-          <p>Default credentials:</p>
-          <p>Username: admin | Password: password</p>
-        </div>
       </div>
     </div>
   );

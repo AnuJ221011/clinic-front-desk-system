@@ -9,61 +9,71 @@ const AppointmentList = ({
 }) => {
   if (appointments.length === 0) {
     return (
-      <div
-        className="text-center"
-        style={{ padding: "2rem", color: "#6b7280" }}
-      >
-        <p>No appointments found for selected date</p>
+      <div className="text-center py-12 text-gray-400 bg-gray-900 rounded-lg shadow-inner">
+        <p>No appointments found for the selected date</p>
       </div>
     );
   }
 
   return (
-    <div style={{ overflowX: "auto" }}>
-      <table className="table">
-        <thead>
+    <div className="overflow-x-auto rounded-xl shadow-lg bg-gray-900">
+      <table className="min-w-full text-gray-200">
+        <thead className="bg-gray-800 text-gray-300 uppercase text-xs tracking-wider">
           <tr>
-            <th>Patient Name</th>
-            <th>Phone</th>
-            <th>Doctor</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Status</th>
-            <th>Actions</th>
+            <th className="px-4 py-3 text-left">Patient Name</th>
+            <th className="px-4 py-3 text-left">Phone</th>
+            <th className="px-4 py-3 text-left">Doctor</th>
+            <th className="px-4 py-3 text-left">Date</th>
+            <th className="px-4 py-3 text-left">Time</th>
+            <th className="px-4 py-3 text-left">Status</th>
+            <th className="px-4 py-3 text-left">Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-700">
           {appointments.map((appointment) => (
-            <tr key={appointment.id}>
-              <td>{appointment.patient_name}</td>
-              <td>{appointment.patient_phone}</td>
-              <td>
+            <tr
+              key={appointment.id}
+              className="hover:bg-gray-800 transition-colors"
+            >
+              <td className="px-4 py-3">{appointment.patient_name}</td>
+              <td className="px-4 py-3">{appointment.patient_phone}</td>
+              <td className="px-4 py-3">
                 <div>
-                  <strong>{appointment.doctor_name}</strong>
+                  <span className="font-semibold text-indigo-400">
+                    {appointment.doctor_name}
+                  </span>
                   <br />
-                  <small>{appointment.specialization}</small>
+                  <span className="text-sm text-gray-400">
+                    {appointment.specialization}
+                  </span>
                 </div>
               </td>
-              <td>
+              <td className="px-4 py-3">
                 {new Date(appointment.appointment_date).toLocaleDateString()}
               </td>
-              <td>{appointment.appointment_time}</td>
-              <td>
+              <td className="px-4 py-3">{appointment.appointment_time}</td>
+              <td className="px-4 py-3">
                 <span
-                  className={`status-badge status-${appointment.status}`}
+                  className={`px-2 py-1 rounded-full text-xs font-medium 
+                    ${
+                      appointment.status === "booked"
+                        ? "bg-blue-500/20 text-blue-400"
+                        : appointment.status === "completed"
+                        ? "bg-green-500/20 text-green-400"
+                        : "bg-red-500/20 text-red-400"
+                    }`}
                 >
                   {appointment.status}
                 </span>
               </td>
-              <td>
-                <div className="flex gap-1">
+              <td className="px-4 py-3">
+                <div className="flex flex-wrap gap-2">
                   <select
                     value={appointment.status}
                     onChange={(e) =>
                       onUpdateStatus(appointment.id, e.target.value)
                     }
-                    className="form-control"
-                    style={{ width: "auto" }}
+                    className="bg-gray-900 border border-gray-700 text-gray-200 text-sm rounded-md px-2 py-1 focus:ring-indigo-500 focus:border-indigo-500"
                     disabled={appointment.status === "cancelled"}
                   >
                     <option value="booked">Booked</option>
@@ -74,13 +84,13 @@ const AppointmentList = ({
                   {appointment.status !== "cancelled" ? (
                     <>
                       <button
-                        className="btn btn-warning"
+                        className="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-md text-sm hover:bg-yellow-500/30 transition"
                         onClick={() => onCancelAppointment(appointment.id)}
                       >
                         Cancel
                       </button>
                       <button
-                        className="btn btn-info"
+                        className="bg-indigo-500/20 text-indigo-400 px-3 py-1 rounded-md text-sm hover:bg-indigo-500/30 transition"
                         onClick={() => onRescheduleAppointment(appointment)}
                       >
                         Reschedule
@@ -88,7 +98,7 @@ const AppointmentList = ({
                     </>
                   ) : (
                     <button
-                      className="btn btn-danger"
+                      className="bg-red-500/20 text-red-400 px-3 py-1 rounded-md text-sm hover:bg-red-500/30 transition"
                       onClick={() => onDeleteAppointment(appointment.id)}
                     >
                       Delete

@@ -34,35 +34,20 @@ const BookAppointmentModal = ({ isOpen, onClose, onSubmit, doctors, rescheduleDa
   const handleSubmit = (e) => {
     e.preventDefault();
     if (rescheduleData) {
-      // update existing appointment
       onSubmit(rescheduleData.id, {
         ...formData,
         status: "booked", // reset to booked when rescheduled
       });
     } else {
-      // new appointment
       onSubmit(formData);
     }
     onClose();
   };
 
   const timeSlots = [
-    "09:00",
-    "09:30",
-    "10:00",
-    "10:30",
-    "11:00",
-    "11:30",
-    "12:00",
-    "12:30",
-    "14:00",
-    "14:30",
-    "15:00",
-    "15:30",
-    "16:00",
-    "16:30",
-    "17:00",
-    "17:30",
+    "09:00","09:30","10:00","10:30","11:00","11:30",
+    "12:00","12:30","14:00","14:30","15:00","15:30",
+    "16:00","16:30","17:00","17:30",
   ];
 
   return (
@@ -71,53 +56,65 @@ const BookAppointmentModal = ({ isOpen, onClose, onSubmit, doctors, rescheduleDa
       onClose={onClose}
       title={rescheduleData ? "Reschedule Appointment" : "Book Appointment"}
     >
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Patient Name *</label>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Patient Name */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1">
+            Patient Name *
+          </label>
           <input
             type="text"
             name="patientName"
             value={formData.patientName}
             onChange={handleChange}
-            className="form-control"
             required
-            disabled={!!rescheduleData} // patient info fixed in reschedule
+            disabled={!!rescheduleData}
+            className="w-full rounded-lg bg-gray-800 border border-gray-700 text-gray-200 px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-60"
           />
         </div>
 
-        <div className="form-group">
-          <label>Phone Number *</label>
+        {/* Phone */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1">
+            Phone Number *
+          </label>
           <input
             type="tel"
             name="patientPhone"
             value={formData.patientPhone}
             onChange={handleChange}
-            className="form-control"
             required
             disabled={!!rescheduleData}
+            className="w-full rounded-lg bg-gray-800 border border-gray-700 text-gray-200 px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-60"
           />
         </div>
 
-        <div className="form-group">
-          <label>Email</label>
+        {/* Email */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1">
+            Email
+          </label>
           <input
             type="email"
             name="patientEmail"
             value={formData.patientEmail}
             onChange={handleChange}
-            className="form-control"
             disabled={!!rescheduleData}
+            className="w-full rounded-lg bg-gray-800 border border-gray-700 text-gray-200 px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-60"
           />
         </div>
 
-        <div className="form-group">
-          <label>Doctor *</label>
+        {/* Doctor */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1">
+            Doctor *
+          </label>
           <select
             name="doctorId"
             value={formData.doctorId}
             onChange={handleChange}
-            className="form-control"
             required
+            className="w-full rounded-lg bg-gray-800 border border-gray-700 text-gray-200 px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="">Select Doctor</option>
             {doctors.map((doctor) => (
@@ -128,28 +125,32 @@ const BookAppointmentModal = ({ isOpen, onClose, onSubmit, doctors, rescheduleDa
           </select>
         </div>
 
-        <div className="grid grid-2">
-          <div className="form-group">
-            <label>Date *</label>
+        {/* Date + Time */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Date *
+            </label>
             <input
               type="date"
               name="appointmentDate"
               value={formData.appointmentDate}
               onChange={handleChange}
-              className="form-control"
               min={new Date().toISOString().split("T")[0]}
               required
+              className="w-full rounded-lg bg-gray-800 border border-gray-700 text-gray-200 px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
-
-          <div className="form-group">
-            <label>Time *</label>
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Time *
+            </label>
             <select
               name="appointmentTime"
               value={formData.appointmentTime}
               onChange={handleChange}
-              className="form-control"
               required
+              className="w-full rounded-lg bg-gray-800 border border-gray-700 text-gray-200 px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
             >
               <option value="">Select Time</option>
               {timeSlots.map((time) => (
@@ -161,11 +162,19 @@ const BookAppointmentModal = ({ isOpen, onClose, onSubmit, doctors, rescheduleDa
           </div>
         </div>
 
-        <div className="flex gap-1 mt-1">
-          <button type="submit" className="btn btn-primary">
+        {/* Actions */}
+        <div className="flex justify-end gap-3 pt-4">
+          <button
+            type="submit"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition shadow-md"
+          >
             {rescheduleData ? "Reschedule" : "Book Appointment"}
           </button>
-          <button type="button" className="btn btn-secondary" onClick={onClose}>
+          <button
+            type="button"
+            onClick={onClose}
+            className="bg-gray-700 hover:bg-gray-600 text-gray-200 text-sm font-medium px-5 py-2 rounded-lg transition shadow-md"
+          >
             Cancel
           </button>
         </div>
