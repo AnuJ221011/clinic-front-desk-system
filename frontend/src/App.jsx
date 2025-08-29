@@ -51,7 +51,7 @@ function App() {
         {!showRegister ? (
           <>
             <Login onLogin={handleLogin} />
-            <div className="text-center mt-4">
+            <div className="text-center">
               <p className="text-sm text-gray-400">
                 New user?{' '}
                 <button
