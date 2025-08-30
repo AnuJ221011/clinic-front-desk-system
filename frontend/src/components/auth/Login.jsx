@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { authService } from "../../services/auth";
 
 const Login = ({ onLogin }) => {
@@ -23,13 +24,22 @@ const Login = ({ onLogin }) => {
 
     try {
       const response = await authService.login(formData);
+
       localStorage.setItem("token", response.token);
       localStorage.setItem("user", JSON.stringify(response.user));
-      toast.success("Login successful!");
-      onLogin(response.user);
+
+      toast.success("Login successful! Redirecting...", { autoClose: 3000 });
+
+      console.log("Login successful:", response);
+
+      setTimeout(() => {
+        onLogin && onLogin(response.user);
+      }, 2000);
     } catch (error) {
       console.error("Login failed:", error);
-      toast.error("Invalid username or password!");
+
+    
+      toast.error(error.response?.data?.message || "Invalid username or password!", { autoClose: 3000 });
     } finally {
       setLoading(false);
     }
@@ -40,7 +50,6 @@ const Login = ({ onLogin }) => {
       <div className="w-full max-w-md bg-gray-800 rounded-2xl shadow-lg p-8">
         <h2 className="text-3xl font-bold text-center text-white mb-6">Login</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Username */}
           <input
             type="text"
             name="username"
@@ -48,12 +57,8 @@ const Login = ({ onLogin }) => {
             value={formData.username}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white 
-                       placeholder-gray-400 focus:outline-none focus:ring-2 
-                       focus:ring-indigo-500"
+            className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
-
-          {/* Password with toggle */}
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -62,9 +67,7 @@ const Login = ({ onLogin }) => {
               value={formData.password}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white 
-                         placeholder-gray-400 focus:outline-none focus:ring-2 
-                         focus:ring-indigo-500"
+              className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <span
               onClick={() => setShowPassword(!showPassword)}
@@ -73,18 +76,17 @@ const Login = ({ onLogin }) => {
               {showPassword ? "🙈" : "👁️"}
             </span>
           </div>
-
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 
-                       text-white font-semibold transition disabled:opacity-50"
+            className="w-full py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition disabled:opacity-50"
           >
             {loading ? "Signing in..." : "Login"}
           </button>
         </form>
       </div>
+
+      <ToastContainer position="top-center" />
     </div>
   );
 };

@@ -1,77 +1,79 @@
-const getAllAppointments = (req, res) => {
+const getAllAppointments = async (req, res) => {
   const { date } = req.query;
-  
-  let query = `
-    SELECT a.*, d.name as doctor_name, d.specialization 
-    FROM appointments a 
-    JOIN doctors d ON a.doctor_id = d.id
-  `;
-  
-  const params = [];
-  
-  if (date) {
-    query += ' WHERE a.appointment_date = ?';
-    params.push(date);
-  }
-  
-  query += ' ORDER BY a.appointment_date, a.appointment_time';
 
-  req.db.query(query, params, (err, results) => {
-    if (err) {
-      return res.status(500).json({ message: 'Database error' });
+  try {
+    let query = `
+      SELECT a.*, d.name as doctor_name, d.specialization 
+      FROM appointments a 
+      JOIN doctors d ON a.doctor_id = d.id
+    `;
+    const params = [];
+
+    if (date) {
+      query += ' WHERE a.appointment_date = $1';
+      params.push(date);
     }
 
-    res.json(results);
-  });
+    query += ' ORDER BY a.appointment_date, a.appointment_time';
+
+    const { rows } = await req.db.query(query, params);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Database error' });
+  }
 };
 
-const createAppointment = (req, res) => {
+const createAppointment = async (req, res) => {
   const { patientName, patientPhone, patientEmail, appointmentDate, appointmentTime, doctorId } = req.body;
 
   const query = `
-    INSERT INTO appointments (patient_name, patient_phone, patient_email, appointment_date, appointment_time, doctor_id)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO appointments 
+      (patient_name, patient_phone, patient_email, appointment_date, appointment_time, doctor_id)
+    VALUES ($1, $2, $3, $4, $5, $6)
+    RETURNING id
   `;
 
-  req.db.query(query, [
-    patientName,
-    patientPhone,
-    patientEmail,
-    appointmentDate,
-    appointmentTime,
-    doctorId
-  ], (err, results) => {
-    if (err) {
-      return res.status(500).json({ message: 'Database error' });
-    }
+  try {
+    const { rows } = await req.db.query(query, [
+      patientName,
+      patientPhone,
+      patientEmail,
+      appointmentDate,
+      appointmentTime,
+      doctorId
+    ]);
 
     res.status(201).json({
       message: 'Appointment created successfully',
-      id: results.insertId
+      id: rows[0].id
     });
-  });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Database error' });
+  }
 };
 
-const updateAppointment = (req, res) => {
+const updateAppointment = async (req, res) => {
   const { id } = req.params;
   const { status, appointmentDate, appointmentTime } = req.body;
 
-  let query = 'UPDATE appointments SET ';
-  const params = [];
   const updates = [];
+  const params = [];
+  let index = 1;
 
   if (status) {
-    updates.push('status = ?');
+    updates.push(`status = $${index++}`);
     params.push(status);
   }
 
   if (appointmentDate) {
-    updates.push('appointment_date = ?');
+    updates.push(`appointment_date = $${index++}`);
     params.push(appointmentDate);
   }
 
   if (appointmentTime) {
-    updates.push('appointment_time = ?');
+    updates.push(`appointment_time = $${index++}`);
     params.push(appointmentTime);
   }
 
@@ -79,38 +81,40 @@ const updateAppointment = (req, res) => {
     return res.status(400).json({ message: 'No fields to update' });
   }
 
-  query += updates.join(', ') + ' WHERE id = ?';
+  const query = `UPDATE appointments SET ${updates.join(', ')} WHERE id = $${index} RETURNING *`;
   params.push(id);
 
-  req.db.query(query, params, (err, results) => {
-    if (err) {
-      return res.status(500).json({ message: 'Database error' });
-    }
+  try {
+    const { rows } = await req.db.query(query, params);
 
-    if (results.affectedRows === 0) {
+    if (rows.length === 0) {
       return res.status(404).json({ message: 'Appointment not found' });
     }
 
     res.json({ message: 'Appointment updated successfully' });
-  });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Database error' });
+  }
 };
 
-const deleteAppointment = (req, res) => {
+const deleteAppointment = async (req, res) => {
   const { id } = req.params;
 
-  const query = 'DELETE FROM appointments WHERE id = ?';
+  const query = 'DELETE FROM appointments WHERE id = $1 RETURNING *';
 
-  req.db.query(query, [id], (err, results) => {
-    if (err) {
-      return res.status(500).json({ message: 'Database error' });
-    }
+  try {
+    const { rows } = await req.db.query(query, [id]);
 
-    if (results.affectedRows === 0) {
+    if (rows.length === 0) {
       return res.status(404).json({ message: 'Appointment not found' });
     }
 
     res.json({ message: 'Appointment deleted successfully' });
-  });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Database error' });
+  }
 };
 
 module.exports = {

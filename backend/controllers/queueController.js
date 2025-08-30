@@ -1,99 +1,97 @@
-const getAllQueue = (req, res) => {
+const getAllQueue = async (req, res) => {
   const query = 'SELECT * FROM queue ORDER BY is_priority DESC, queue_number ASC';
 
-  req.db.query(query, (err, results) => {
-    if (err) {
-      return res.status(500).json({ message: 'Database error' });
-    }
-
-    res.json(results);
-  });
+  try {
+    const { rows } = await req.db.query(query);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Database error' });
+  }
 };
 
-const addToQueue = (req, res) => {
+const addToQueue = async (req, res) => {
   const { patientName, patientPhone, isPriority } = req.body;
 
-  // Get next queue number
   const getNextNumberQuery = 'SELECT COALESCE(MAX(queue_number), 0) + 1 as next_number FROM queue';
 
-  req.db.query(getNextNumberQuery, (err, results) => {
-    if (err) {
-      return res.status(500).json({ message: 'Database error' });
-    }
-
-    const queueNumber = results[0].next_number;
+  try {
+    const { rows } = await req.db.query(getNextNumberQuery);
+    const queueNumber = rows[0].next_number;
 
     const insertQuery = `
       INSERT INTO queue (queue_number, patient_name, patient_phone, is_priority)
-      VALUES (?, ?, ?, ?)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id
     `;
 
-    req.db.query(insertQuery, [
+    const insertResult = await req.db.query(insertQuery, [
       queueNumber,
       patientName,
       patientPhone || null,
       isPriority || false
-    ], (err, results) => {
-      if (err) {
-        return res.status(500).json({ message: 'Database error' });
-      }
+    ]);
 
-      res.status(201).json({
-        message: 'Patient added to queue successfully',
-        id: results.insertId,
-        queueNumber
-      });
+    res.status(201).json({
+      message: 'Patient added to queue successfully',
+      id: insertResult.rows[0].id,
+      queueNumber
     });
-  });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Database error' });
+  }
 };
 
-const updateQueueStatus = (req, res) => {
+const updateQueueStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
 
-  const query = 'UPDATE queue SET status = ? WHERE id = ?';
+  const query = 'UPDATE queue SET status = $1 WHERE id = $2 RETURNING *';
 
-  req.db.query(query, [status, id], (err, results) => {
-    if (err) {
-      return res.status(500).json({ message: 'Database error' });
-    }
+  try {
+    const { rows } = await req.db.query(query, [status, id]);
 
-    if (results.affectedRows === 0) {
+    if (rows.length === 0) {
       return res.status(404).json({ message: 'Queue item not found' });
     }
 
     res.json({ message: 'Queue status updated successfully' });
-  });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Database error' });
+  }
 };
 
-const removeFromQueue = (req, res) => {
+const removeFromQueue = async (req, res) => {
   const { id } = req.params;
 
-  const query = 'DELETE FROM queue WHERE id = ?';
+  const query = 'DELETE FROM queue WHERE id = $1 RETURNING *';
 
-  req.db.query(query, [id], (err, results) => {
-    if (err) {
-      return res.status(500).json({ message: 'Database error' });
-    }
+  try {
+    const { rows } = await req.db.query(query, [id]);
 
-    if (results.affectedRows === 0) {
+    if (rows.length === 0) {
       return res.status(404).json({ message: 'Queue item not found' });
     }
 
     res.json({ message: 'Patient removed from queue successfully' });
-  });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Database error' });
+  }
 };
 
-const clearQueue = (req, res) => {
+const clearQueue = async (req, res) => {
   const query = 'DELETE FROM queue';
 
-  req.db.query(query, (err, results) => {
-    if (err) {
-      return res.status(500).json({ message: 'Database error' });
-    }
-
+  try {
+    await req.db.query(query);
     res.json({ message: 'Queue cleared successfully' });
-  });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Database error' });
+  }
 };
 
 module.exports = {
@@ -103,4 +101,3 @@ module.exports = {
   removeFromQueue,
   clearQueue
 };
-

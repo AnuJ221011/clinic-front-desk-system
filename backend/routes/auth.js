@@ -4,18 +4,13 @@ const { register, login, getProfile } = require('../controllers/authController')
 const auth = require('../middleware/auth');
 
 const router = express.Router();
-const { createTables } = require('../config/database');
-
-router.use((req, res, next) => {
-  createTables(req.db);
-  next();
-});
 
 // REGISTER
 router.post('/register', [
   body('username').notEmpty().withMessage('Username is required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('name').notEmpty().withMessage('Name is required')
+  body('name').notEmpty().withMessage('Name is required'),
+  body('role').notEmpty().withMessage('Role is required') // allow role input
 ], register);
 
 // LOGIN
