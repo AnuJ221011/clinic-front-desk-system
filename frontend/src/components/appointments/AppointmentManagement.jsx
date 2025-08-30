@@ -95,25 +95,25 @@ const AppointmentManagement = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="p-6">
-      <div className="bg-gray-900 text-gray-100 rounded-2xl shadow-xl p-6 border border-gray-800">
+    <div className="p-4 sm:p-6">
+      <div className="bg-gray-900 text-gray-100 rounded-2xl shadow-xl p-4 sm:p-6 border border-gray-800">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-6">
-          <h2 className="text-2xl font-bold text-indigo-400">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-indigo-400">
             Appointment Management
           </h2>
-          <div className="flex gap-4 items-center">
-            <div>
-              <label className="text-sm text-gray-400 mr-2">Date:</label>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-gray-400">Date:</label>
               <input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded-md px-2 sm:px-3 py-1 sm:py-2 focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
             <button
-              className="bg-indigo-600 hover:bg-indigo-700 transition px-5 py-2 rounded-lg text-white text-sm font-medium shadow-md"
+              className="bg-indigo-600 hover:bg-indigo-700 transition px-4 sm:px-5 py-2 rounded-lg text-white text-sm sm:text-base font-medium shadow-md"
               onClick={() => {
                 setShowBookModal(true);
                 setRescheduleData(null); // fresh booking
@@ -125,13 +125,15 @@ const AppointmentManagement = () => {
         </div>
 
         {/* Appointment List */}
-        <AppointmentList
-          appointments={appointments}
-          onUpdateStatus={handleUpdateStatus}
-          onCancelAppointment={handleCancelAppointment}
-          onDeleteAppointment={handleDeleteAppointment}
-          onRescheduleAppointment={handleRescheduleAppointment}
-        />
+        <div className="overflow-x-auto">
+          <AppointmentList
+            appointments={appointments}
+            onUpdateStatus={handleUpdateStatus}
+            onCancelAppointment={handleCancelAppointment}
+            onDeleteAppointment={handleDeleteAppointment}
+            onRescheduleAppointment={handleRescheduleAppointment}
+          />
+        </div>
       </div>
 
       {/* Modal */}

@@ -11,10 +11,7 @@ const AddPatientModal = ({ isOpen, onClose, onSubmit }) => {
   const handleChange = (e) => {
     const value =
       e.target.type === "checkbox" ? e.target.checked : e.target.value;
-    setFormData({
-      ...formData,
-      [e.target.name]: value,
-    });
+    setFormData({ ...formData, [e.target.name]: value });
   };
 
   const handleSubmit = (e) => {
@@ -29,7 +26,10 @@ const AddPatientModal = ({ isOpen, onClose, onSubmit }) => {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Add Patient to Queue">
-      <form onSubmit={handleSubmit} className="space-y-4 text-gray-200">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 text-gray-200 max-h-[80vh] overflow-y-auto"
+      >
         {/* Patient Name */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -40,8 +40,9 @@ const AddPatientModal = ({ isOpen, onClose, onSubmit }) => {
             name="patientName"
             value={formData.patientName}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-700 rounded-lg bg-gray-800 text-gray-200 placeholder-gray-500 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
             required
+            placeholder="Enter patient name"
+            className="w-full px-3 py-2 border border-gray-700 rounded-lg bg-gray-800 text-gray-200 placeholder-gray-500 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
           />
         </div>
 
@@ -55,6 +56,7 @@ const AddPatientModal = ({ isOpen, onClose, onSubmit }) => {
             name="patientPhone"
             value={formData.patientPhone}
             onChange={handleChange}
+            placeholder="Enter phone number"
             className="w-full px-3 py-2 border border-gray-700 rounded-lg bg-gray-800 text-gray-200 placeholder-gray-500 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
           />
         </div>
@@ -74,16 +76,16 @@ const AddPatientModal = ({ isOpen, onClose, onSubmit }) => {
         </div>
 
         {/* Buttons */}
-        <div className="flex gap-3 pt-2">
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition w-full sm:w-auto"
           >
             Add to Queue
           </button>
           <button
             type="button"
-            className="px-4 py-2 bg-gray-700 text-gray-200 rounded-lg shadow hover:bg-gray-600 transition"
+            className="px-4 py-2 bg-gray-700 text-gray-200 rounded-lg shadow hover:bg-gray-600 transition w-full sm:w-auto"
             onClick={onClose}
           >
             Cancel

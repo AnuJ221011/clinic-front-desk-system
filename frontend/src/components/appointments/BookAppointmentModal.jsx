@@ -163,17 +163,17 @@ const BookAppointmentModal = ({ isOpen, onClose, onSubmit, doctors, rescheduleDa
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-4">
+        <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
           <button
             type="submit"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition shadow-md"
+            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition shadow-md"
           >
             {rescheduleData ? "Reschedule" : "Book Appointment"}
           </button>
           <button
             type="button"
             onClick={onClose}
-            className="bg-gray-700 hover:bg-gray-600 text-gray-200 text-sm font-medium px-5 py-2 rounded-lg transition shadow-md"
+            className="w-full sm:w-auto bg-gray-700 hover:bg-gray-600 text-gray-200 text-sm font-medium px-5 py-2 rounded-lg transition shadow-md"
           >
             Cancel
           </button>

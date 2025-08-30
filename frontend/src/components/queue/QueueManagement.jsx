@@ -73,21 +73,23 @@ const QueueManagement = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="p-4">
-      <div className="bg-gray-900 shadow-lg rounded-xl p-6 border border-gray-700">
+    <div className="p-4 sm:p-6">
+      <div className="bg-gray-900 shadow-lg rounded-xl p-4 sm:p-6 border border-gray-700">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-100">Queue Management</h2>
-          <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-2 sm:gap-0">
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-100">
+            Queue Management
+          </h2>
+          <div className="flex gap-2 sm:gap-3">
             <button
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm sm:text-base"
               onClick={() => setShowAddModal(true)}
             >
               Add Patient
             </button>
             {queue.length > 0 && (
               <button
-                className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition"
+                className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition text-sm sm:text-base"
                 onClick={handleClearQueue}
               >
                 Clear Queue
@@ -104,7 +106,7 @@ const QueueManagement = () => {
         />
       </div>
 
-      {/* Modal */}
+      {/* Add Patient Modal */}
       <AddPatientModal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}

@@ -27,7 +27,7 @@ const DoctorModal = ({ isOpen, onClose, onSubmit, doctor, isEditing }) => {
         specialization: doctor.specialization,
         gender: doctor.gender,
         location: doctor.location,
-        availability: doctor.availability,
+        availability: doctor.availability || [],
       });
     } else {
       setFormData({
@@ -40,22 +40,14 @@ const DoctorModal = ({ isOpen, onClose, onSubmit, doctor, isEditing }) => {
     }
   }, [doctor, isEditing, isOpen]);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleAvailabilityChange = (day) => {
     const updatedAvailability = formData.availability.includes(day)
       ? formData.availability.filter((d) => d !== day)
       : [...formData.availability, day];
-
-    setFormData({
-      ...formData,
-      availability: updatedAvailability,
-    });
+    setFormData({ ...formData, availability: updatedAvailability });
   };
 
   const handleSubmit = (e) => {
@@ -73,7 +65,10 @@ const DoctorModal = ({ isOpen, onClose, onSubmit, doctor, isEditing }) => {
       onClose={onClose}
       title={isEditing ? "Edit Doctor" : "Add Doctor"}
     >
-      <form onSubmit={handleSubmit} className="space-y-4 text-gray-200">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 text-gray-200 max-h-[80vh] overflow-y-auto"
+      >
         {/* Doctor Name */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -84,8 +79,9 @@ const DoctorModal = ({ isOpen, onClose, onSubmit, doctor, isEditing }) => {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full border border-gray-700 rounded-md p-2 bg-gray-800 text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
             required
+            placeholder="e.g. Dr. John Doe"
+            className="w-full border border-gray-700 rounded-md p-2 bg-gray-800 text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
         </div>
 
@@ -99,14 +95,14 @@ const DoctorModal = ({ isOpen, onClose, onSubmit, doctor, isEditing }) => {
             name="specialization"
             value={formData.specialization}
             onChange={handleChange}
-            className="w-full border border-gray-700 rounded-md p-2 bg-gray-800 text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
             required
             placeholder="e.g. Cardiologist, Pediatrician"
+            className="w-full border border-gray-700 rounded-md p-2 bg-gray-800 text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
         </div>
 
         {/* Gender + Location */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">
               Gender *
@@ -115,8 +111,8 @@ const DoctorModal = ({ isOpen, onClose, onSubmit, doctor, isEditing }) => {
               name="gender"
               value={formData.gender}
               onChange={handleChange}
-              className="w-full border border-gray-700 rounded-md p-2 bg-gray-800 text-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               required
+              className="w-full border border-gray-700 rounded-md p-2 bg-gray-800 text-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
             >
               <option value="male">Male</option>
               <option value="female">Female</option>
@@ -133,19 +129,19 @@ const DoctorModal = ({ isOpen, onClose, onSubmit, doctor, isEditing }) => {
               name="location"
               value={formData.location}
               onChange={handleChange}
-              className="w-full border border-gray-700 rounded-md p-2 bg-gray-800 text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               required
               placeholder="e.g. Room 101, Building A"
+              className="w-full border border-gray-700 rounded-md p-2 bg-gray-800 text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
         </div>
 
         {/* Availability */}
         <div>
-          <label className="block text-sm font-medium text-gray-300">
+          <label className="block text-sm font-medium text-gray-300 mb-1">
             Availability *
           </label>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1">
             {daysOfWeek.map((day) => (
               <label
                 key={day}
@@ -164,17 +160,17 @@ const DoctorModal = ({ isOpen, onClose, onSubmit, doctor, isEditing }) => {
         </div>
 
         {/* Actions */}
-        <div className="flex gap-3 pt-2">
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition"
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition w-full sm:w-auto"
           >
             {isEditing ? "Update Doctor" : "Add Doctor"}
           </button>
           <button
             type="button"
-            className="px-4 py-2 bg-gray-700 text-gray-200 text-sm rounded-md hover:bg-gray-600 transition"
             onClick={onClose}
+            className="px-4 py-2 bg-gray-700 text-gray-200 rounded-md hover:bg-gray-600 transition w-full sm:w-auto"
           >
             Cancel
           </button>

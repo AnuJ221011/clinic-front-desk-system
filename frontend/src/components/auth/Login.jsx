@@ -30,25 +30,26 @@ const Login = ({ onLogin }) => {
 
       toast.success("Login successful! Redirecting...", { autoClose: 3000 });
 
-      console.log("Login successful:", response);
-
       setTimeout(() => {
         onLogin && onLogin(response.user);
       }, 2000);
     } catch (error) {
       console.error("Login failed:", error);
-
-    
-      toast.error(error.response?.data?.message || "Invalid username or password!", { autoClose: 3000 });
+      toast.error(
+        error.response?.data?.message || "Invalid username or password!",
+        { autoClose: 4000 }
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex h-auto w-screen items-center justify-center bg-gray-900">
-      <div className="w-full max-w-md bg-gray-800 rounded-2xl shadow-lg p-8">
-        <h2 className="text-3xl font-bold text-center text-white mb-6">Login</h2>
+    <div className="flex min-h-screen items-center justify-center bg-gray-900 p-4">
+      <div className="w-full max-w-md sm:max-w-sm md:max-w-md bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-8">
+        <h2 className="text-3xl font-bold text-center text-white mb-6">
+          Login
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"

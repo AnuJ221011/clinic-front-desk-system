@@ -15,16 +15,20 @@ const DoctorManagement = () => {
     location: "",
   });
 
+  // Debounce loading doctors when filters change
   useEffect(() => {
-    loadDoctors();
+    const timer = setTimeout(() => loadDoctors(), 500);
+    return () => clearTimeout(timer);
   }, [filters]);
 
   const loadDoctors = async () => {
+    setLoading(true);
     try {
       const data = await doctorService.getAllDoctors(filters);
       setDoctors(data);
     } catch (error) {
       console.error("Failed to load doctors:", error);
+      toast.error("Failed to load doctors");
     } finally {
       setLoading(false);
     }
@@ -38,6 +42,7 @@ const DoctorManagement = () => {
       setShowModal(false);
     } catch (error) {
       console.error("Failed to add doctor:", error);
+      toast.error("Failed to add doctor!");
     }
   };
 
@@ -50,6 +55,7 @@ const DoctorManagement = () => {
       setEditingDoctor(null);
     } catch (error) {
       console.error("Failed to update doctor:", error);
+      toast.error("Failed to update doctor!");
     }
   };
 
@@ -61,6 +67,7 @@ const DoctorManagement = () => {
         loadDoctors();
       } catch (error) {
         console.error("Failed to delete doctor:", error);
+        toast.error("Failed to delete doctor!");
       }
     }
   };
@@ -85,21 +92,24 @@ const DoctorManagement = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="p-6">
-      <div className="bg-gray-900 text-gray-200 rounded-xl shadow-lg p-6">
+    <div className="p-4 sm:p-6">
+      <div className="bg-gray-900 text-gray-200 rounded-xl shadow-lg p-4 sm:p-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3 sm:gap-0">
           <h2 className="text-2xl font-bold text-white">Doctor Management</h2>
           <button
             className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition shadow-md"
-            onClick={() => setShowModal(true)}
+            onClick={() => {
+              setEditingDoctor(null);
+              setShowModal(true);
+            }}
           >
             Add Doctor
           </button>
         </div>
 
         {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">
               Filter by Specialization
@@ -109,8 +119,8 @@ const DoctorManagement = () => {
               name="specialization"
               value={filters.specialization}
               onChange={handleFilterChange}
-              className="w-full border border-gray-700 rounded-md p-2 bg-gray-800 text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               placeholder="Search specialization..."
+              className="w-full border border-gray-700 rounded-md p-2 bg-gray-800 text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
           <div>
@@ -122,8 +132,8 @@ const DoctorManagement = () => {
               name="location"
               value={filters.location}
               onChange={handleFilterChange}
-              className="w-full border border-gray-700 rounded-md p-2 bg-gray-800 text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               placeholder="Search location..."
+              className="w-full border border-gray-700 rounded-md p-2 bg-gray-800 text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
         </div>

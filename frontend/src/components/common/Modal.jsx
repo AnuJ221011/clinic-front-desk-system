@@ -5,16 +5,16 @@ const Modal = ({ isOpen, onClose, title, children }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <div
-        className="bg-gray-900 text-gray-100 rounded-2xl shadow-2xl w-full max-w-md p-6 relative"
+        className="bg-gray-900 text-gray-100 rounded-2xl shadow-2xl w-full max-w-md sm:max-w-lg p-6 relative overflow-auto max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-white">{title}</h3>
+          <h3 className="text-lg sm:text-xl font-semibold text-white">{title}</h3>
           <button
             className="text-gray-400 hover:text-red-400 text-2xl font-bold transition"
             onClick={onClose}

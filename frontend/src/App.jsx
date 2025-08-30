@@ -16,21 +16,12 @@ function App() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
-    
-    if (token && userData) {
-      setUser(JSON.parse(userData));
-    }
+    if (token && userData) setUser(JSON.parse(userData));
     setLoading(false);
   }, []);
 
-  const handleLogin = (userData) => {
-    setUser(userData);
-  };
-
-  const handleRegister = (userData) => {
-    setUser(userData);
-  };
-
+  const handleLogin = (userData) => setUser(userData);
+  const handleRegister = (userData) => setUser(userData);
   const handleLogout = () => {
     authService.logout();
     setUser(null);
@@ -39,19 +30,18 @@ function App() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-900">
-        <div className="w-8 h-8 border-4 border-gray-700 border-t-indigo-500 rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-gray-700 border-t-indigo-500 rounded-full animate-spin"></div>
       </div>
     );
   }
 
-  // If no user logged in → show login/register
   if (!user) {
     return (
-      <div className="bg-gray-900 min-h-screen flex flex-col items-center justify-center text-gray-200">
+      <div className="bg-gray-900 min-h-screen flex flex-col items-center justify-center text-gray-200 px-4 sm:px-6">
         {!showRegister ? (
           <>
             <Login onLogin={handleLogin} />
-            <div className="text-center">
+            <div className="text-center mt-2 sm:mt-4">
               <p className="text-sm text-gray-400">
                 New user?{' '}
                 <button
@@ -66,7 +56,7 @@ function App() {
         ) : (
           <>
             <Register onRegister={handleRegister} />
-            <div className="text-center mt-4">
+            <div className="text-center mt-2 sm:mt-4">
               <p className="text-sm text-gray-400">
                 Already have an account?{' '}
                 <button
@@ -83,49 +73,35 @@ function App() {
     );
   }
 
-  // If logged in → show dashboard
   return (
-    <div className="max-w-6xl mx-auto p-5 text-gray-200">
+    <div className="max-w-6xl mx-auto p-4 sm:p-5 text-gray-200">
       <Header user={user} onLogout={handleLogout} />
 
       {/* Navigation Tabs */}
-      <div className="flex gap-4 border-b-2 border-gray-800 mb-6">
-        <button
-          className={`px-4 py-2 text-gray-400 border-b-2 transition ${
-            activeTab === 'queue'
-              ? 'text-indigo-400 border-indigo-400'
-              : 'border-transparent hover:text-indigo-300'
-          }`}
-          onClick={() => setActiveTab('queue')}
-        >
-          Queue Management
-        </button>
-        <button
-          className={`px-4 py-2 text-gray-400 border-b-2 transition ${
-            activeTab === 'appointments'
-              ? 'text-indigo-400 border-indigo-400'
-              : 'border-transparent hover:text-indigo-300'
-          }`}
-          onClick={() => setActiveTab('appointments')}
-        >
-          Appointments
-        </button>
-        <button
-          className={`px-4 py-2 text-gray-400 border-b-2 transition ${
-            activeTab === 'doctors'
-              ? 'text-indigo-400 border-indigo-400'
-              : 'border-transparent hover:text-indigo-300'
-          }`}
-          onClick={() => setActiveTab('doctors')}
-        >
-          Doctors
-        </button>
+      <div className="flex flex-wrap gap-2 sm:gap-4 border-b-2 border-gray-800 mb-6">
+        {['queue', 'appointments', 'doctors'].map((tab) => (
+          <button
+            key={tab}
+            className={`px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base rounded transition border-b-2 ${
+              activeTab === tab
+                ? 'text-indigo-400 border-indigo-400'
+                : 'text-gray-400 border-transparent hover:text-indigo-300'
+            }`}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab === 'queue'
+              ? 'Queue Management'
+              : tab.charAt(0).toUpperCase() + tab.slice(1)}
+          </button>
+        ))}
       </div>
 
       {/* Active Tab Content */}
-      {activeTab === 'queue' && <QueueManagement />}
-      {activeTab === 'appointments' && <AppointmentManagement />}
-      {activeTab === 'doctors' && <DoctorManagement />}
+      <div className="w-full">
+        {activeTab === 'queue' && <QueueManagement />}
+        {activeTab === 'appointments' && <AppointmentManagement />}
+        {activeTab === 'doctors' && <DoctorManagement />}
+      </div>
     </div>
   );
 }
