@@ -37,37 +37,17 @@ function App() {
 
   if (!user) {
     return (
-      <div className="bg-gray-900 min-h-screen flex flex-col items-center justify-center text-gray-200 px-4 sm:px-6">
+      <div className="bg-gray-900 min-h-screen">
         {!showRegister ? (
-          <>
-            <Login onLogin={handleLogin} />
-            <div className="text-center mt-2 sm:mt-4">
-              <p className="text-sm text-gray-400">
-                New user?{' '}
-                <button
-                  className="text-indigo-400 hover:text-indigo-300 font-medium transition"
-                  onClick={() => setShowRegister(true)}
-                >
-                  Register here
-                </button>
-              </p>
-            </div>
-          </>
+          <Login 
+            onLogin={handleLogin} 
+            onSwitchToRegister={() => setShowRegister(true)}
+          />
         ) : (
-          <>
-            <Register onRegister={handleRegister} />
-            <div className="text-center mt-2 sm:mt-4">
-              <p className="text-sm text-gray-400">
-                Already have an account?{' '}
-                <button
-                  className="text-indigo-400 hover:text-indigo-300 font-medium transition"
-                  onClick={() => setShowRegister(false)}
-                >
-                  Login here
-                </button>
-              </p>
-            </div>
-          </>
+          <Register 
+            onRegister={handleRegister} 
+            onSwitchToLogin={() => setShowRegister(false)}
+          />
         )}
       </div>
     );
