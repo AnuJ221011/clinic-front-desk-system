@@ -31,7 +31,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login'; // Redirect to login on unauthorized
+      window.location.reload();
     }
     
     const message = error.response?.data?.message || 'An error occurred';
