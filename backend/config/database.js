@@ -62,7 +62,7 @@ const createTables = async (client) => {
     console.log('Tables created and default user inserted successfully!');
   } catch (err) {
     console.error('Error creating tables:', err);
-    process.exit(1); // exit if DB setup fails
+    process.exit(1);
   }
 };
 
