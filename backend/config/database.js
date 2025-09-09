@@ -22,7 +22,8 @@ const createTables = async (client) => {
         location VARCHAR(100) NOT NULL,
         availability JSON NOT NULL,
         is_active BOOLEAN DEFAULT true,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        is_available BOOLEAN DEFAULT true
       )
     `);
 

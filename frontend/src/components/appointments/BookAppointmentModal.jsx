@@ -6,9 +6,9 @@ const BookAppointmentModal = ({ isOpen, onClose, onSubmit, doctors, rescheduleDa
     patientName: "",
     patientPhone: "",
     patientEmail: "",
-    appointmentDate: new Date().toISOString().split("T")[0],
-    appointmentTime: "",
-    doctorId: "",
+    appointmentDate: rescheduleData?.appointmentDate || new Date().toISOString().split("T")[0],
+    appointmentTime: rescheduleData?.appointmentTime || "",
+    doctorId: rescheduleData?.doctorId || "",
   });
 
   useEffect(() => {
@@ -31,18 +31,19 @@ const BookAppointmentModal = ({ isOpen, onClose, onSubmit, doctors, rescheduleDa
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (rescheduleData) {
-      onSubmit(rescheduleData.id, {
-        ...formData,
-        status: "booked", // reset to booked when rescheduled
-      });
-    } else {
-      onSubmit(formData);
-    }
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    await onSubmit({
+      ...formData,
+      id: rescheduleData?.id,   // include id if rescheduling
+      status: rescheduleData ? "booked" : undefined,
+    });
     onClose();
-  };
+  } catch (err) {
+    console.error("Failed to submit appointment:", err);
+  }
+};
 
   const timeSlots = [
     "09:00","09:30","10:00","10:30","11:00","11:30",

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
+import { toast,ToastContainer } from "react-toastify";
 import { appointmentService } from "../../services/appointments";
 import { doctorService } from "../../services/doctors";
 import AppointmentList from "./AppointmentList";
@@ -36,28 +36,47 @@ const AppointmentManagement = () => {
     }
   };
 
-  const handleBookAppointment = async (appointmentData) => {
-    try {
-      await appointmentService.createAppointment(appointmentData);
-      toast.success("Appointment booked successfully!");
-      loadData();
-      setShowBookModal(false);
-    } catch (error) {
-      console.error("Failed to book appointment:", error);
+const handleBookAppointment = async (appointmentData) => {
+  try {
+    if (!appointmentData.doctorId || !appointmentData.appointmentDate || !appointmentData.appointmentTime) {
+      toast.error("Please select doctor, date and time");
+      return;
+    }
+
+    await appointmentService.createAppointment(appointmentData);
+
+    toast.success("Appointment booked successfully!");
+    loadData();
+  } catch (error) {
+    console.error("Failed to book appointment:", error);
+
+    // Correctly check for Axios response
+    if (error.response?.status === 400) {
+      console.log("Anuj handling error");
+      const backendMessage = error.response.data?.message;
+      toast.error(backendMessage || "Doctor is not available at this time.");
+    } else {
+      console.log("Failed to book");
       toast.error("Failed to book appointment!");
     }
-  };
+  }
+};
 
-  const handleUpdateStatus = async (id, status) => {
-    try {
-      await appointmentService.updateAppointment(id, { status });
-      toast.success("Appointment status updated!");
-      loadData();
-    } catch (error) {
-      console.error("Failed to update appointment:", error);
-      toast.error("Failed to update status!");
-    }
-  };
+
+
+
+  const handleUpdateStatus = async (id, updateData) => {
+  try {
+    await appointmentService.updateAppointment(id, updateData);
+    toast.success("Appointment rescheduled!");
+    loadData();
+    setShowBookModal(false);
+    setRescheduleData(null);
+  } catch (error) {
+    console.error("Failed to update appointment:", error);
+    toast.error("Failed to update appointment!");
+  }
+};
 
   const handleCancelAppointment = async (id) => {
     if (window.confirm("Are you sure you want to cancel this appointment?")) {
@@ -91,6 +110,22 @@ const AppointmentManagement = () => {
     setRescheduleData(appointment);
     setShowBookModal(true);
   };
+
+
+  const handleModalSubmit = (data) => {
+  if (rescheduleData) {
+    const updateData = {
+      appointmentDate: data.appointmentDate,
+      appointmentTime: data.appointmentTime,
+      doctorId: data.doctorId,
+      status: "booked",
+    };
+    handleUpdateStatus(data.id, updateData);
+  } else {
+    handleBookAppointment(data);
+  }
+};
+
 
   if (loading) return <LoadingSpinner />;
 
@@ -140,10 +175,12 @@ const AppointmentManagement = () => {
       <BookAppointmentModal
         isOpen={showBookModal}
         onClose={() => setShowBookModal(false)}
-        onSubmit={rescheduleData ? handleUpdateStatus : handleBookAppointment}
+        onSubmit={handleModalSubmit}
         doctors={doctors}
         rescheduleData={rescheduleData}
       />
+      {/* Toast Container */}
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };
