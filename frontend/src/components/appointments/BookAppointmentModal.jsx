@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Modal from "../common/Modal";
+import { toast } from "react-toastify";
 
 const BookAppointmentModal = ({ isOpen, onClose, onSubmit, doctors, rescheduleData }) => {
   const [formData, setFormData] = useState({
@@ -31,19 +32,33 @@ const BookAppointmentModal = ({ isOpen, onClose, onSubmit, doctors, rescheduleDa
     });
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = (e) => {
   e.preventDefault();
-  try {
-    await onSubmit({
-      ...formData,
-      id: rescheduleData?.id,   // include id if rescheduling
-      status: rescheduleData ? "booked" : undefined,
-    });
-    onClose();
-  } catch (err) {
-    console.error("Failed to submit appointment:", err);
+  if (!formData.appointmentDate || !formData.doctorId) {
+    toast.error("Please select doctor and date");
+    return;
   }
+
+  const selectedDoctor = doctors.find((d) => d.id === Number(formData.doctorId));
+  if (!selectedDoctor) {
+    toast.error("Invalid doctor selected");
+    return;
+  }
+
+  const selectedDay = new Date(formData.appointmentDate).toLocaleDateString("en-US", {
+    weekday: "long",
+  });
+
+  if (!selectedDoctor.availability.includes(selectedDay)) {
+    toast.error(`Dr. ${selectedDoctor.name} is not available on ${selectedDay}`);
+    return;
+  }
+
+  // send correct data back to parent
+  onSubmit({ ...formData, id: rescheduleData?.id });
 };
+
+
 
   const timeSlots = [
     "09:00","09:30","10:00","10:30","11:00","11:30",

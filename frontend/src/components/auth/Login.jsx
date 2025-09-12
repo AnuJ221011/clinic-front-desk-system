@@ -25,28 +25,32 @@ const Login = ({ onLogin, onSwitchToRegister }) => {
     try {
       const response = await authService.login(formData);
 
+      if (!response || !response.token) {
+        throw new Error("Invalid response from server");
+      }
+
       localStorage.setItem("token", response.token);
       localStorage.setItem("user", JSON.stringify(response.user));
 
-      toast.success("Login successful! Redirecting...", { autoClose: 3000 });
+      toast.success("Login successful! Redirecting...", { autoClose: 2000 });
 
       setTimeout(() => {
-        onLogin && onLogin(response.user);
+        onLogin?.(response.user);
       }, 1000);
     } catch (error) {
-      console.error("Login failed:", error);
-      toast.error(
-        error.response?.data?.message || "Invalid username or password!",
-        { autoClose: 4000 }
-      );
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "Something went wrong!";
+      toast.error(message, { autoClose: 4000 });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-900 p-4">
-      <div className="w-full max-w-md sm:max-w-sm md:max-w-md">
+    <div className="flex min-h-screen items-center justify-center bg-gray-900 p-4 relative">
+      <div className="w-full max-w-md z-10">
         <div className="bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-8">
           <h2 className="text-3xl font-bold text-center text-white mb-6">
             Login
@@ -73,6 +77,9 @@ const Login = ({ onLogin, onSwitchToRegister }) => {
               />
               <span
                 onClick={() => setShowPassword(!showPassword)}
+                onKeyDown={(e) => e.key === "Enter" && setShowPassword(!showPassword)}
+                tabIndex={0}
+                role="button"
                 className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-400"
               >
                 {showPassword ? "🙈" : "👁️"}
@@ -80,18 +87,18 @@ const Login = ({ onLogin, onSwitchToRegister }) => {
             </div>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !formData.username || !formData.password}
               className="w-full py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition disabled:opacity-50"
             >
               {loading ? "Signing in..." : "Login"}
             </button>
           </form>
         </div>
-        
+
         {/* Switch to Register Text */}
         <div className="text-center mt-4">
           <p className="text-sm text-gray-400">
-            New user?{' '}
+            New user?{" "}
             <button
               className="text-indigo-400 hover:text-indigo-300 font-medium transition"
               onClick={onSwitchToRegister}

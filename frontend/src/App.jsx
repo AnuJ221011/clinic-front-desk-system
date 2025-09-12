@@ -27,17 +27,31 @@ function App() {
     setUser(null);
   };
 
+  const tabConfig = [
+    { key: 'queue', label: 'Queue Management', icon: '⏱️' },
+    { key: 'appointments', label: 'Appointments', icon: '📅' },
+    { key: 'doctors', label: 'Doctors', icon: '👩‍⚕️' }
+  ];
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900">
-        <div className="w-10 h-10 border-4 border-gray-700 border-t-indigo-500 rounded-full animate-spin"></div>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-gray-600 border-t-emerald-400 rounded-full animate-spin"></div>
+            <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-r-blue-400 rounded-full animate-spin animate-reverse"></div>
+          </div>
+          <div className="text-gray-300 text-lg font-medium animate-pulse">Loading Healthcare System...</div>
+        </div>
       </div>
     );
   }
 
   if (!user) {
+    console.log('user not logged in');
     return (
-      <div className="bg-gray-900 min-h-screen">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent"></div>
         {!showRegister ? (
           <Login 
             onLogin={handleLogin} 
@@ -54,34 +68,108 @@ function App() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-4 sm:p-5 text-gray-200">
-      <Header user={user} onLogout={handleLogout} />
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <Header user={user} onLogout={handleLogout} />
 
-      {/* Navigation Tabs */}
-      <div className="flex flex-wrap gap-2 sm:gap-4 border-b-2 border-gray-800 mb-6">
-        {['queue', 'appointments', 'doctors'].map((tab) => (
-          <button
-            key={tab}
-            className={`px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base rounded transition border-b-2 ${
-              activeTab === tab
-                ? 'text-indigo-400 border-indigo-400'
-                : 'text-gray-400 border-transparent hover:text-indigo-300'
-            }`}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab === 'queue'
-              ? 'Queue Management'
-              : tab.charAt(0).toUpperCase() + tab.slice(1)}
-          </button>
-        ))}
+        {/* Main Content Container */}
+        <div className="mt-8">
+          {/* Navigation Tabs */}
+          <div className="mb-8">
+            <div className="border-b border-gray-700/50">
+              <nav className="flex space-x-1 overflow-x-auto scrollbar-hide" aria-label="Tabs">
+                {tabConfig.map((tab) => (
+                  <button
+                    key={tab.key}
+                    className={`group relative min-w-0 flex-1 overflow-hidden py-4 px-6 text-center text-sm font-medium transition-all duration-200 ${
+                      activeTab === tab.key
+                        ? 'text-white'
+                        : 'text-gray-400 hover:text-gray-200'
+                    }`}
+                    onClick={() => setActiveTab(tab.key)}
+                  >
+                    <span className="flex items-center justify-center space-x-2">
+                      <span className="text-lg">{tab.icon}</span>
+                      <span className="hidden sm:inline">{tab.label}</span>
+                      <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+                    </span>
+                    
+                    {/* Active Tab Indicator */}
+                    <span
+                      className={`absolute inset-x-0 bottom-0 h-1 transition-all duration-300 ${
+                        activeTab === tab.key
+                          ? 'bg-gradient-to-r from-emerald-400 to-blue-500 scale-100'
+                          : 'bg-gray-600 scale-0 group-hover:scale-100'
+                      }`}
+                    ></span>
+                    
+                    {/* Hover Background */}
+                    <span className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
+                  </button>
+                ))}
+              </nav>
+            </div>
+          </div>
+
+          {/* Tab Content */}
+          <div className="relative">
+            {/* Background Card */}
+            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 shadow-2xl"></div>
+            
+            {/* Content */}
+            <div className="relative p-6 sm:p-8">
+              <div className="transition-all duration-300 ease-in-out">
+                {activeTab === 'queue' && (
+                  <div className="animate-fadeIn">
+                    <QueueManagement />
+                  </div>
+                )}
+                {activeTab === 'appointments' && (
+                  <div className="animate-fadeIn">
+                    <AppointmentManagement />
+                  </div>
+                )}
+                {activeTab === 'doctors' && (
+                  <div className="animate-fadeIn">
+                    <DoctorManagement />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Active Tab Content */}
-      <div className="w-full">
-        {activeTab === 'queue' && <QueueManagement />}
-        {activeTab === 'appointments' && <AppointmentManagement />}
-        {activeTab === 'doctors' && <DoctorManagement />}
-      </div>
+      {/* Custom Styles */}
+      <style jsx>{`
+        .bg-grid-white {
+          background-image: 
+            linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px);
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-reverse {
+          animation-direction: reverse;
+        }
+        
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 }

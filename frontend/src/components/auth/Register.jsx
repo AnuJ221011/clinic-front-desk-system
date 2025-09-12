@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { authService } from "../../services/auth";
 
 const Register = ({ onRegister, onSwitchToLogin }) => {
   const [formData, setFormData] = useState({
@@ -22,39 +22,39 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
     setError("");
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
-        {
-          username: formData.email,
-          name: formData.name,
-          password: formData.password,
-          role: formData.role,
-        }
-      );
+      // The API expects "username" (not "email") for registration
+      const payload = {
+        name: formData.name,
+        username: formData.email,
+        password: formData.password,
+        role: formData.role
+      };
+
+      const result = await authService.register(payload);
 
       toast.success("Registration successful! You can now log in.", {
         autoClose: 3000,
       });
 
       setTimeout(() => {
-        onRegister(response.data);
+        onRegister?.(result);
       }, 1000);
     } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || "Registration failed");
-      toast.error(err.response?.data?.message || "Registration failed", {
-        autoClose: 4000,
-      });
+      const msg = err.response?.data?.message || err.message || "Registration failed";
+      setError(msg);
+      toast.error(msg, { autoClose: 4000 });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-900 p-4">
-      <div className="w-full max-w-md sm:max-w-sm md:max-w-md">
+    <div className="flex min-h-screen items-center justify-center bg-gray-900 p-4 relative">
+      <div className="w-full max-w-md z-10">
         <div className="bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-8">
-          <h2 className="text-3xl font-bold text-center text-white mb-6">Register</h2>
+          <h2 className="text-3xl font-bold text-center text-white mb-6">
+            Register
+          </h2>
           {error && <p className="text-red-500 text-center mb-4">{error}</p>}
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
@@ -103,11 +103,10 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
             </button>
           </form>
         </div>
-        
         {/* Switch to Login Text */}
         <div className="text-center mt-4">
           <p className="text-sm text-gray-400">
-            Already have an account?{' '}
+            Already have an account?{" "}
             <button
               className="text-indigo-400 hover:text-indigo-300 font-medium transition"
               onClick={onSwitchToLogin}
@@ -117,7 +116,6 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
           </p>
         </div>
       </div>
-
       <ToastContainer position="top-center" />
     </div>
   );
