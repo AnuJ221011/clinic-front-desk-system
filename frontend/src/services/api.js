@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://clinic-front-desk-system.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_URL,
