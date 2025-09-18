@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-const API_URL = 'https://clinic-front-desk-system.onrender.com/api';
+const API_URL = window.location.hostname === "localhost"
+    ? "http://localhost:5000/api"
+    : "https://book4myhealth.online/api";
 
 const api = axios.create({
   baseURL: API_URL,
