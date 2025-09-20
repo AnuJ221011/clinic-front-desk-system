@@ -7,20 +7,22 @@ const {
   deleteDoctor
 } = require('../controllers/doctorController');
 const auth = require('../middleware/auth');
+const frontDeskMiddleware = require('../middleware/frontDeskMiddleware');
 
 const router = express.Router();
 
 router.get('/', auth, getAllDoctors);
 router.post('/', [
   auth,
+  frontDeskMiddleware,
   body('name').notEmpty().withMessage('Name is required'),
   body('specialization').notEmpty().withMessage('Specialization is required'),
   body('gender').isIn(['male', 'female', 'other']).withMessage('Invalid gender'),
   body('location').notEmpty().withMessage('Location is required'),
-  body('availability').isArray().withMessage('Availability must be an array')
+  body('availability').isObject().withMessage('Availability must be an object')
 ], createDoctor);
 
-router.put('/:id', auth, updateDoctor);
-router.delete('/:id', auth, deleteDoctor);
+router.put('/:id', auth, frontDeskMiddleware, updateDoctor);
+router.delete('/:id', auth, frontDeskMiddleware, deleteDoctor);
 
 module.exports = router;

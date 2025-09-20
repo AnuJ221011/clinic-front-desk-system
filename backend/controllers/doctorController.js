@@ -5,12 +5,12 @@ const getAllDoctors = async (req, res) => {
 
   if (specialization) {
     params.push(`%${specialization}%`);
-    query += ` AND specialization LIKE $${params.length}`;
+    query += ` AND specialization ILIKE $${params.length}`;
   }
 
   if (location) {
     params.push(`%${location}%`);
-    query += ` AND location LIKE $${params.length}`;
+    query += ` AND location ILIKE $${params.length}`;
   }
 
   query += ' ORDER BY name';
@@ -20,7 +20,7 @@ const getAllDoctors = async (req, res) => {
 
     const doctors = rows.map((row) => ({
       ...row,
-      available_days: row.availability ? row.availability : []
+      availability: row.availability || {}
     }));
 
     res.json(doctors);
@@ -64,7 +64,11 @@ const updateDoctor = async (req, res) => {
 
   const query = `
     UPDATE doctors 
-    SET name = $1, specialization = $2, gender = $3, location = $4, availability = $5
+    SET name = COALESCE($1, name),
+        specialization = COALESCE($2, specialization),
+        gender = COALESCE($3, gender),
+        location = COALESCE($4, location),
+        availability = COALESCE($5, availability)
     WHERE id = $6
     RETURNING *
   `;
@@ -75,7 +79,7 @@ const updateDoctor = async (req, res) => {
       specialization,
       gender,
       location,
-      JSON.stringify(availability),
+      availability ? JSON.stringify(availability) : null,
       id
     ]);
 
@@ -83,7 +87,7 @@ const updateDoctor = async (req, res) => {
       return res.status(404).json({ message: 'Doctor not found' });
     }
 
-    res.json({ message: 'Doctor updated successfully' });
+    res.json({ message: 'Doctor updated successfully', doctor: rows[0] });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Database error' });

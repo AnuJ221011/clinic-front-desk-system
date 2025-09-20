@@ -41,10 +41,13 @@ const login = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  const { username, password, name, role } = req.body;
+  const { username, password, name } = req.body;
 
   try {
-    const { rows: existing } = await req.db.query('SELECT * FROM users WHERE username = $1', [username]);
+    const { rows: existing } = await req.db.query(
+      'SELECT * FROM users WHERE username = $1',
+      [username]
+    );
     if (existing.length > 0) {
       return res.status(400).json({ message: 'Username already exists' });
     }
@@ -52,14 +55,14 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const { rows } = await req.db.query(
-      'INSERT INTO users (username, password, name, role) VALUES ($1,$2,$3,$4) RETURNING id',
-      [username, hashedPassword, name, role || 'front_desk']
+      'INSERT INTO users (username, password, name, role) VALUES ($1, $2, $3, $4) RETURNING id, role',
+      [username, hashedPassword, name, "user"] // always user
     );
 
-    const userId = rows[0].id;
+    const user = rows[0];
 
     const token = jwt.sign(
-      { id: userId, username, role: role || 'front_desk' },
+      { id: user.id, username, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRE }
     );
@@ -67,13 +70,14 @@ const register = async (req, res) => {
     res.status(201).json({
       message: 'User registered successfully',
       token,
-      user: { id: userId, username, name, role: role || 'front_desk' }
+      user: { id: user.id, username, name, role: user.role }
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 
 const getProfile = async (req, res) => {
@@ -93,4 +97,44 @@ const getProfile = async (req, res) => {
   }
 };
 
-module.exports = { login, getProfile, register };
+const assignRole = async (req, res) => {
+  const { role } = req.body;
+  const { id } = req.params;
+
+  // Only allow certain roles
+  const validRoles = ["user", "front_desk"];
+  if (!validRoles.includes(role)) {
+    return res.status(400).json({ message: "Invalid role" });
+  }
+
+  try {
+    const { rows } = await req.db.query(
+      "UPDATE users SET role = $1 WHERE id = $2 RETURNING id, username, name, role",
+      [role, id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ message: "Role updated successfully", user: rows[0] });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getAllUsers = async (req, res) => {
+  try {
+    const { rows } = await req.db.query(
+      "SELECT id, username, name, role FROM users ORDER BY created_at DESC"
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+module.exports = { login, getProfile, register, assignRole, getAllUsers };

@@ -1,7 +1,8 @@
 const express = require('express');
 const { body } = require('express-validator');
-const { register, login, getProfile } = require('../controllers/authController');
+const { register, login, getProfile,assignRole, getAllUsers } = require('../controllers/authController');
 const auth = require('../middleware/auth');
+const adminMiddleware = require('../middleware/adminMiddleware');
 
 const router = express.Router();
 
@@ -21,5 +22,9 @@ router.post('/login', [
 
 // PROFILE
 router.get('/profile', auth, getProfile);
+
+// Only admin can update roles
+router.put('/assign-role/:id', auth, adminMiddleware, assignRole);
+router.get('/users', auth, adminMiddleware, getAllUsers);
 
 module.exports = router;

@@ -8,7 +8,7 @@ const createTables = async (client) => {
         username VARCHAR(50) UNIQUE NOT NULL,
         password VARCHAR(255) NOT NULL,
         name VARCHAR(100) NOT NULL,
-        role VARCHAR(20) DEFAULT 'front_desk',
+        role VARCHAR(20) DEFAULT 'user',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
@@ -20,7 +20,7 @@ const createTables = async (client) => {
         specialization VARCHAR(100) NOT NULL,
         gender VARCHAR(10) CHECK (gender IN ('male','female','other')) NOT NULL,
         location VARCHAR(100) NOT NULL,
-        availability JSON NOT NULL,
+        availability JSONB NOT NULL,
         is_active BOOLEAN DEFAULT true,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         is_available BOOLEAN DEFAULT true
@@ -56,7 +56,7 @@ const createTables = async (client) => {
     const defaultPassword = await bcrypt.hash('password', 10);
     await client.query(`
       INSERT INTO users (username, password, name, role)
-      VALUES ('admin', $1, 'Admin User', 'front_desk')
+      VALUES ('admin', $1, 'Admin User', 'admin')
       ON CONFLICT (username) DO NOTHING
     `, [defaultPassword]);
 

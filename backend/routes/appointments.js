@@ -7,19 +7,15 @@ const {
   deleteAppointment
 } = require('../controllers/appointmentController');
 const auth = require('../middleware/auth');
+const frontDeskMiddleware = require('../middleware/frontDeskMiddleware');
 
 const router = express.Router();
 
-// @route   GET /api/appointments
-// @desc    Get all appointments
-// @access  Private
 router.get('/', auth, getAllAppointments);
 
-// @route   POST /api/appointments
-// @desc    Create appointment
-// @access  Private
 router.post('/', [
   auth,
+  frontDeskMiddleware,
   body('patientName').notEmpty().withMessage('Patient name is required'),
   body('patientPhone').notEmpty().withMessage('Patient phone is required'),
   body('appointmentDate').isDate().withMessage('Valid appointment date is required'),
@@ -27,7 +23,7 @@ router.post('/', [
   body('doctorId').isInt().withMessage('Valid doctor ID is required')
 ], createAppointment);
 
-router.put('/:id', auth, updateAppointment);
-router.delete('/:id', auth, deleteAppointment);
+router.put('/:id', auth, frontDeskMiddleware, updateAppointment);
+router.delete('/:id', auth, frontDeskMiddleware, deleteAppointment);
 
 module.exports = router;
