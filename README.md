@@ -1,5 +1,8 @@
 # 🏥 Clinic Front Desk Management System
 
+![Dashboard Screenshot](frontend/public/dashboard.png)
+
+
 A **full-stack MERN-style application** (React + Node.js + Express + PostgreSQL) for managing a clinic's front desk operations.  
 This system supports **doctor management, appointment booking, and patient queue management** with secure authentication.
 
@@ -10,6 +13,8 @@ This system supports **doctor management, appointment booking, and patient queue
 - 🔐 **Authentication & Authorization**
   - User registration & login
   - JWT-based authentication
+  - Role-based access control
+
 
 - 👨‍⚕️ **Doctor Management**
   - Add, update, delete doctors
