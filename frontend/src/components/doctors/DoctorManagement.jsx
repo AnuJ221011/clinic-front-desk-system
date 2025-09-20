@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { doctorService } from "../../services/doctors";
 import DoctorList from "./DoctorList";
 import DoctorModal from "./DoctorModal";
@@ -273,6 +273,9 @@ const DoctorManagement = () => {
           doctor={editingDoctor}
           isEditing={!!editingDoctor}
         />
+
+        {/* Toast Container */}
+      <ToastContainer position="top-center" autoClose={3000} />
       </div>
     </div>
   );

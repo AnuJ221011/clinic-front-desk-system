@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { queueService } from "../../services/queue";
 import QueueList from "./QueueList";
 import AddPatientModal from "./AddPatientModal";
@@ -42,7 +42,8 @@ const QueueManagement = () => {
       toast.success("Queue status updated!");
       loadQueue();
     } catch (error) {
-      console.error("Failed to update status:", error);
+      const errorMsg = error.response?.data?.message || "Failed to update status";
+      toast.error(errorMsg);
     }
   };
 
@@ -223,6 +224,9 @@ const QueueManagement = () => {
         onClose={() => setShowAddModal(false)}
         onSubmit={handleAddPatient}
       />
+
+      {/* Toast Container */}
+      <ToastContainer position="top-center" autoClose={3000} />
     </div>
   );
 };

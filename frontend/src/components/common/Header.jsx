@@ -1,6 +1,8 @@
-import React from "react";
+import { useState } from "react";
+import AssignRoleModal from "./AssignRoleModal";
 
 const Header = ({ user, onLogout }) => {
+    const [showRoleModal, setShowRoleModal] = useState(false);
   return (
     <header className="relative mb-6">
       {/* Background with blur effect */}
@@ -36,6 +38,20 @@ const Header = ({ user, onLogout }) => {
 
           {/* Right side: User info and logout */}
           <div className="flex items-center space-x-4">
+
+            {/* Assign Roles Button */}
+                    {user.role === "admin" && (
+                      <div className="mb-4">
+                        <button
+                          onClick={() => setShowRoleModal(true)}
+                          className="px-4 py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-pink-500 to-red-500 hover:bg-gradient-to-r hover:from-pink-600 hover:to-red-600 transition duration-300"
+                        >
+                          Assign Roles to Users 👥
+                        </button>
+                      </div>
+                    )}
+            
+                    {showRoleModal && <AssignRoleModal onClose={() => setShowRoleModal(false)} />}
             
             {/* User Avatar and Role */}
             <div className="hidden sm:flex items-center space-x-3 px-4 py-2 bg-white/5 rounded-xl border border-white/10">

@@ -6,6 +6,7 @@ import QueueManagement from './components/queue/QueueManagement';
 import AppointmentManagement from './components/appointments/AppointmentManagement';
 import DoctorManagement from './components/doctors/DoctorManagement';
 import { authService } from './services/auth';
+import AssignRoleModal from './components/common/AssignRoleModal';
 
 function App() {
   const [user, setUser] = useState(null);
